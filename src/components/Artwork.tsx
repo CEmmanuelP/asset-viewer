@@ -6,19 +6,15 @@ import Viewer from "./Viewer"
 const Artwork = () => {
     const { id } = useParams()
 
-    let artworkId: number
+    const artwork = artworks.find(artwork => artwork.id === parseInt(id ?? ""))
 
-    if (id !== undefined) {
-        artworkId = parseInt(id)
+    if (!artwork) {
+        return <div>Artwork not found</div>
     }
-
-    const artwork = artworks.find(artwork => artwork.id === artworkId)
-
-    console.log(artwork)
 
     return (
         <div className="w-full p-8">
-            <Viewer />
+            <Viewer artwork={artwork} />
             <Label />
         </div>
     )
