@@ -11,13 +11,6 @@ function App() {
       </Routes>
     </BrowserRouter>
   )
-
-  // return (
-  //   <div className="w-full px-8">
-  //     <Viewer />
-  //     <Label />
-  //   </div>
-  // )
 }
 
 export default App

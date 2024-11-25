@@ -1,4 +1,4 @@
-interface Artwork {
+export interface Artwork {
     id: number,
     src: string,
     thumbnail: string,
@@ -9,19 +9,6 @@ interface Artwork {
     artType: string,
     material: string,
     description: string
-}
-
-export const artwork: Artwork = {
-    id: 0,
-    src: "",
-    thumbnail: "",
-    title: "",
-    author: "",
-    year: "",
-    size: "",
-    artType: "",
-    material: "",
-    description: "",
 }
 
 export const artworks: Artwork[] = [
