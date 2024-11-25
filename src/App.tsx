@@ -1,15 +1,15 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { HashRouter, Route, Routes } from "react-router-dom"
 import Artwork from "./components/Artwork"
 import Home from "./pages/Home"
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/artworks/:id" element={<Artwork />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
