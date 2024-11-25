@@ -11,7 +11,7 @@ export interface Artwork {
     description: string
 }
 
-const BASE_URL = import.meta.env.DEV ? '' : '/your-repo-name'
+const BASE_URL = import.meta.env.DEV ? '' : '/asset-viewer'
 
 export const artworks: Artwork[] = [
     {
