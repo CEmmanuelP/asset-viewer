@@ -15,7 +15,7 @@ const Artwork = () => {
     return (
         <div className="w-full p-8">
             <Viewer artwork={artwork} />
-            <Label />
+            <Label artwork={artwork} />
         </div>
     )
 }
