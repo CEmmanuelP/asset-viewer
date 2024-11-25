@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 
 const Home = () => {
     return (
-        <div className="w-full p-8 border-solid border-2 border-zinc-500">
+        <div className="w-full p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {artworks.map((artwork) => (
                     <Link
@@ -15,7 +15,7 @@ const Home = () => {
                         <Card className="overflow-hidden">
                             <div className="aspect-square bg-gray-100">
                                 <img
-                                    src={artwork.src}
+                                    src={artwork.thumbnail}
                                     alt={artwork.title}
                                     className="w-full h-full object-cover"
                                 />

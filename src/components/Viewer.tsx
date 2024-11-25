@@ -9,7 +9,7 @@ interface ViewerProps {
 // height: 476px
 const Viewer = ({ artwork }: ViewerProps) => {
     return (
-        <div className="w-full h-[676px] border-solid border-2 border-zinc-500">
+        <div className="w-full h-[676px]">
             <Canvas shadows gl={{ antialias: false }} dpr={[1, 1.5]} camera={{ position: [4, -1, 8], fov: 35 }}>
                 {/* <color attach="background" args={['skyblue']} /> */}
                 <Stage
