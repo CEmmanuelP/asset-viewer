@@ -11,11 +11,13 @@ export interface Artwork {
     description: string
 }
 
+const BASE_URL = import.meta.env.DEV ? '' : '/your-repo-name'
+
 export const artworks: Artwork[] = [
     {
         id: 1,
-        src: "/artworks/1/mihwangsa_dragonhead.glb",
-        thumbnail: "/artworks/1/mihwangsa_dragonhead.webp",
+        src: `${BASE_URL}/artworks/1/mihwangsa_dragonhead.glb`,
+        thumbnail: `${BASE_URL}/artworks/1/mihwangsa_dragonhead.webp`,
         title: "미황사 용두",
         author: "미상",
         year: "2024",
