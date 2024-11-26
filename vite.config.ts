@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === "production" ? "/asset-viewer" : "/",
+  base: process.env.NODE_ENV === "production" ? "/asset-viewer/" : "/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
