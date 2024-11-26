@@ -9,6 +9,11 @@ export interface Artwork {
     artType: string,
     material: string,
     description: string
+    display?: Display
+}
+
+interface Display {
+    backgroundColor: string
 }
 
 const BASE_URL = import.meta.env.DEV ? '' : '/asset-viewer'
@@ -31,16 +36,4 @@ export const artworks: Artwork[] = [
         This 3D printable model was digitised in collaboration between Scan the World and The Musée des Augustins. The sculpture was scanned in the museum and has been shared with their permission. The model can be downloaded and 3D printed from Scan the World.
         `
     }
-    // {
-    //     id: 2,
-    //     src: "./artworks/2/model.glb",
-    //     thumbnail: "./artworks/2/thumbnail.webp",
-    //     title: "작품 2",
-    //     author: "작가 2",
-    //     year: "2024",
-    //     size: "120x80cm",
-    //     artType: "조각",
-    //     material: "Bronze",
-    //     description: "작품 설명 2"
-    // }
 ]

@@ -2,6 +2,7 @@ import { Artwork } from "@/data"
 import { Center, OrbitControls, Stage, useProgress } from "@react-three/drei"
 import { Canvas, useLoader } from "@react-three/fiber"
 import { Suspense } from "react"
+import { Color } from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { Progress } from "./ui/progress"
@@ -14,7 +15,7 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/')
 dracoLoader.preload()
 
-function Model({ url }: { url: string }) {
+const Model = ({ url }: { url: string }) => {
     const gltf = useLoader(GLTFLoader, url, (loader) => {
         loader.setDRACOLoader(dracoLoader)
     })
@@ -29,9 +30,16 @@ function Model({ url }: { url: string }) {
         </Center>)
 }
 
+const hexToRGB = (hex: string): [number, number, number] => {
+    const color = new Color(hex)
+    return [color.r, color.g, color.b]
+}
+
 const Viewer = ({ artwork }: ViewerProps) => {
     const { progress, total, loaded } = useProgress()
     const isLoading = progress !== 100
+
+    const backgroundColor = artwork.display?.backgroundColor !== undefined ? hexToRGB(artwork.display?.backgroundColor) : hexToRGB("#FFFFFF")
 
     if (isLoading) {
         return (
@@ -52,7 +60,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
     return (
         <div className="w-full h-[476px] md:h-[576px]">
             <Canvas shadows gl={{ antialias: false }} dpr={[1, 1.5]} camera={{ position: [4, -1, 8], fov: 35 }}>
-                <color attach="background" args={[1, 1, 1]} />
+                <color attach="background" args={backgroundColor} />
                 <Suspense fallback={null}>
                     <Stage
                         intensity={0.7}
@@ -67,7 +75,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
                     makeDefault
                     minPolarAngle={0}
                     maxPolarAngle={Math.PI / 1.9}
-                    minDistance={3}
+                    minDistance={5}
                     maxDistance={7}
                 />
             </Canvas>
