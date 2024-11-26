@@ -11,7 +11,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
     console.log("src :", artwork.src)
 
     return (
-        <div className="w-full h-[676px]">
+        <div className="w-full h-[576px]">
             <Canvas shadows gl={{ antialias: false }} dpr={[1, 1.5]} camera={{ position: [4, -1, 8], fov: 35 }}>
                 {/* <color attach="background" args={['skyblue']} /> */}
                 <Stage
