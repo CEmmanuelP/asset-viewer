@@ -22,7 +22,7 @@ export const artworks: Artwork[] = [
         author: "미상",
         year: "2024",
         size: "100x100cm",
-        artType: "회화",
+        artType: "조각",
         material: "Oil on canvas",
         description: `Antonin Mercié (1845-1916) worked on the biblical theme of the young David vanquishing the giant Goliath, representing the boy in a similar a juvenile, adrogynous and graceful adolescent manner to those depictions from the Florentine Renaissance. The soft body and strong contrapposto nod to Donatello's 1440s masterpiece).
 
