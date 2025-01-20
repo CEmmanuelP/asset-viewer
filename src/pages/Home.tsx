@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 
 const Home = () => {
     return (
-        <div className="w-full p-8">
+        <div className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {artworks.map((artwork) => (
                     <Link
@@ -22,9 +22,14 @@ const Home = () => {
                             </div>
 
                             <CardContent className="p-4">
-                                <h3 className="font-bold text-lg mb-1">{artwork.title}</h3>
-                                <p className="text-sm text-gray-600">{artwork.author}</p>
-                                <p className="text-sm text-gray-500">{artwork.year}</p>
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-bold text-lg">{artwork.title}</h3>
+                                    <div className="text-right">
+                                        <span className="text-sm text-gray-600">{artwork.author}</span>
+                                        <span className="text-sm text-gray-500 mx-2">|</span>
+                                        <span className="text-sm text-gray-500">{artwork.year}</span>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     </Link>
