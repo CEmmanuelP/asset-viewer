@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Artwork from "./components/Artwork"
 import Header from "./components/Header"
 import Home from "./pages/Home"
+import ScenePage from "./pages/Scene"
 
 function App() {
   const basename = import.meta.env.DEV ? "" : "/asset-viewer"
@@ -15,6 +16,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/artworks/:id" element={<Artwork />} />
+              <Route path="/scene/:id" element={<ScenePage />} />
             </Routes>
           </div>
         </main>
