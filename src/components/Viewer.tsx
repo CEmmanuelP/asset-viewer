@@ -2,13 +2,18 @@ import { Artwork } from "@/data"
 import { Center, OrbitControls, Stage, useProgress } from "@react-three/drei"
 import { Canvas, useLoader } from "@react-three/fiber"
 import { Suspense } from "react"
-import { Color } from "three"
+import { Color, Euler } from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { Progress } from "./ui/progress"
 
-interface ViewerProps {
+export interface ViewerProps {
   artwork: Artwork
+}
+export interface ModelProps {
+  url: string
+  rotation?: { x: number; y: number; z: number }
+  scale?: number
 }
 
 const dracoLoader = new DRACOLoader()
@@ -17,14 +22,24 @@ dracoLoader.setDecoderPath(
 )
 dracoLoader.preload()
 
-const Model = ({ url }: { url: string }) => {
+const Model = ({ url, rotation, scale = 1 }: ModelProps) => {
   const gltf = useLoader(GLTFLoader, url, (loader) => {
     loader.setDRACOLoader(dracoLoader)
   })
 
+  const euler = rotation
+    ? new Euler(rotation.x, rotation.y, rotation.z)
+    : new Euler(0, 0, 0)
+
   return (
     <Center>
-      <primitive object={gltf.scene} castShadow receiveShadow />
+      <primitive
+        object={gltf.scene}
+        castShadow
+        receiveShadow
+        rotation={euler}
+        scale={scale}
+      />
     </Center>
   )
 }
@@ -78,7 +93,11 @@ const Viewer = ({ artwork }: ViewerProps) => {
             adjustCamera={1}
             environment="city"
           >
-            <Model url={artwork.src} />
+            <Model
+              url={artwork.src}
+              rotation={artwork.display?.rotation}
+              scale={artwork.display?.scale}
+            />
           </Stage>
         </Suspense>
         <OrbitControls

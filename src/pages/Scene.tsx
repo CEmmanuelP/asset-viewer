@@ -16,10 +16,7 @@ const ScenePage = () => {
 
   return (
     <div className="w-full h-screen">
-      <SceneViewer
-        modelUrl={artwork.src}
-        backgroundColor={artwork.display?.backgroundColor || "#FFFFFF"}
-      />
+      <SceneViewer artwork={artwork} />
     </div>
   )
 }
