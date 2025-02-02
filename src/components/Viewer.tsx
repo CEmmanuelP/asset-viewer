@@ -1,10 +1,11 @@
 import { Artwork } from "@/data"
 import { Center, OrbitControls, Stage, useProgress } from "@react-three/drei"
 import { Canvas, useLoader } from "@react-three/fiber"
-import { Suspense } from "react"
-import { Color, Euler } from "three"
+import { Suspense, useEffect, useState } from "react"
+import { Color, Euler, Group } from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
+import { Button } from "./ui/button"
 import { Progress } from "./ui/progress"
 
 export interface ViewerProps {
@@ -14,6 +15,8 @@ export interface ModelProps {
   url: string
   rotation?: { x: number; y: number; z: number }
   scale?: number
+
+  onMeshesFound: (meshes: { id: string; name: string }[], scene: Group) => void
 }
 
 const dracoLoader = new DRACOLoader()
@@ -22,10 +25,37 @@ dracoLoader.setDecoderPath(
 )
 dracoLoader.preload()
 
-const Model = ({ url, rotation, scale = 1 }: ModelProps) => {
+const hexToRGB = (hex: string): [number, number, number] => {
+  const color = new Color(hex)
+  return [color.r, color.g, color.b]
+}
+
+const Model = ({ url, rotation, scale = 1, onMeshesFound }: ModelProps) => {
   const gltf = useLoader(GLTFLoader, url, (loader) => {
     loader.setDRACOLoader(dracoLoader)
   })
+
+  console.log(gltf.scene)
+
+  useEffect(() => {
+    const meshList: { id: string; name: string }[] = []
+
+    //@ts-expect-error - child maybe group | mesh
+    gltf.scene.traverse((child) => {
+      if (child.isMesh) {
+        if (child.material && !Array.isArray(child.material)) {
+          child.material.transparent = true
+
+          meshList.push({
+            id: child.uuid,
+            name: child.name || `Part ${meshList.length + 1}`,
+          })
+        }
+      }
+    })
+
+    onMeshesFound(meshList, gltf.scene)
+  }, [])
 
   const euler = rotation
     ? new Euler(rotation.x, rotation.y, rotation.z)
@@ -44,14 +74,39 @@ const Model = ({ url, rotation, scale = 1 }: ModelProps) => {
   )
 }
 
-const hexToRGB = (hex: string): [number, number, number] => {
-  const color = new Color(hex)
-  return [color.r, color.g, color.b]
-}
-
 const Viewer = ({ artwork }: ViewerProps) => {
   const { progress, total, loaded } = useProgress()
   const isLoading = progress !== 100
+  const [meshes, setMeshes] = useState<{ id: string; name: string }[]>([])
+  const [scene, setScene] = useState<THREE.Group | null>(null)
+  const [visibleParts, setVisibleParts] = useState<Record<string, boolean>>({})
+
+  const handleMeshesFound = (
+    meshList: { id: string; name: string }[],
+    modelScene: THREE.Group
+  ) => {
+    setMeshes(meshList)
+    setScene(modelScene)
+
+    const initialVisibility = meshList.reduce((acc, mesh) => {
+      acc[mesh.id] = true
+      return acc
+    }, {} as Record<string, boolean>)
+    setVisibleParts(initialVisibility)
+  }
+
+  const toggleVisibility = (partId: string) => {
+    if (!scene) return
+
+    setVisibleParts((prev) => {
+      const newVisibility = { ...prev, [partId]: !prev[partId] }
+      const model = scene.getObjectByProperty("uuid", partId) as THREE.Mesh
+      if (model?.material && !Array.isArray(model.material)) {
+        model.material.opacity = newVisibility[partId] ? 1 : 0
+      }
+      return newVisibility
+    })
+  }
 
   const backgroundColor =
     artwork.display?.backgroundColor !== undefined
@@ -73,7 +128,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
   }
 
   return (
-    <div className="w-full h-[476px] md:h-[576px]">
+    <div className="w-full h-[476px] md:h-[576px] relative">
       <Canvas
         shadows
         gl={{ antialias: false }}
@@ -97,6 +152,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
               url={artwork.src}
               rotation={artwork.display?.rotation}
               scale={artwork.display?.scale}
+              onMeshesFound={handleMeshesFound}
             />
           </Stage>
         </Suspense>
@@ -109,6 +165,21 @@ const Viewer = ({ artwork }: ViewerProps) => {
           maxDistance={7}
         />
       </Canvas>
+
+      {meshes.length > 0 && (
+        <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
+          {meshes.map((mesh) => (
+            <Button
+              key={mesh.id}
+              onClick={() => toggleVisibility(mesh.id)}
+              variant={visibleParts[mesh.id] ? "default" : "secondary"}
+              size="sm"
+            >
+              {mesh.name}
+            </Button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
