@@ -2,17 +2,29 @@ import { Artwork } from "@/data"
 import { Center, OrbitControls, Stage, useProgress } from "@react-three/drei"
 import { Canvas, useLoader } from "@react-three/fiber"
 import { Suspense, useEffect, useState } from "react"
-import { Color, Euler, Group } from "three"
+import { Color, Euler, Group, Vector3 } from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { Button } from "./ui/button"
 import { Progress } from "./ui/progress"
+
+const DEFAULT_CAMERA = {
+  position: { x: 4, y: -1, z: 8 },
+  fov: 35,
+}
+const DEFAULT_CONTROLS = {
+  minDistance: 5,
+  maxDistance: 7,
+  minPolarAngle: 0,
+  maxPolarAngle: Math.PI / 1.9,
+}
 
 export interface ViewerProps {
   artwork: Artwork
 }
 export interface ModelProps {
   url: string
+  position?: { x: number; y: number; z: number }
   rotation?: { x: number; y: number; z: number }
   scale?: number
 
@@ -30,7 +42,13 @@ const hexToRGB = (hex: string): [number, number, number] => {
   return [color.r, color.g, color.b]
 }
 
-const Model = ({ url, rotation, scale = 1, onMeshesFound }: ModelProps) => {
+const Model = ({
+  url,
+  rotation,
+  position,
+  scale,
+  onMeshesFound,
+}: ModelProps) => {
   const gltf = useLoader(GLTFLoader, url, (loader) => {
     loader.setDRACOLoader(dracoLoader)
   })
@@ -55,9 +73,15 @@ const Model = ({ url, rotation, scale = 1, onMeshesFound }: ModelProps) => {
     onMeshesFound(meshList, gltf.scene)
   }, [])
 
+  const vector = position
+    ? new Vector3(position.x, position.y, position.z)
+    : new Vector3(0, 0, 0)
+
   const euler = rotation
     ? new Euler(rotation.x, rotation.y, rotation.z)
     : new Euler(0, 0, 0)
+
+  const scaleNumber = scale ? scale : 1
 
   return (
     <Center>
@@ -65,8 +89,9 @@ const Model = ({ url, rotation, scale = 1, onMeshesFound }: ModelProps) => {
         object={gltf.scene}
         castShadow
         receiveShadow
+        position={vector}
         rotation={euler}
-        scale={scale}
+        scale={scaleNumber}
       />
     </Center>
   )
@@ -78,6 +103,9 @@ const Viewer = ({ artwork }: ViewerProps) => {
   const [meshes, setMeshes] = useState<{ id: string; name: string }[]>([])
   const [scene, setScene] = useState<THREE.Group | null>(null)
   const [visibleParts, setVisibleParts] = useState<Record<string, boolean>>({})
+
+  const cameraConfig = artwork.scene?.camera || DEFAULT_CAMERA
+  const controlsConfig = artwork.scene?.controls || DEFAULT_CONTROLS
 
   const handleMeshesFound = (
     meshList: { id: string; name: string }[],
@@ -107,8 +135,8 @@ const Viewer = ({ artwork }: ViewerProps) => {
   }
 
   const backgroundColor =
-    artwork.display?.backgroundColor !== undefined
-      ? hexToRGB(artwork.display?.backgroundColor)
+    artwork.scene?.backgroundColor !== undefined
+      ? hexToRGB(artwork.scene?.backgroundColor)
       : hexToRGB("#FFFFFF")
 
   if (isLoading) {
@@ -131,7 +159,14 @@ const Viewer = ({ artwork }: ViewerProps) => {
         shadows
         gl={{ antialias: false }}
         dpr={[1, 1.5]}
-        camera={{ position: [4, -1, 8], fov: 35 }}
+        camera={{
+          position: [
+            cameraConfig.position.x,
+            cameraConfig.position.y,
+            cameraConfig.position.z,
+          ],
+          fov: cameraConfig.fov,
+        }}
       >
         <color attach="background" args={backgroundColor} />
         <Suspense fallback={null}>
@@ -148,6 +183,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
           >
             <Model
               url={artwork.src}
+              position={artwork.display?.position}
               rotation={artwork.display?.rotation}
               scale={artwork.display?.scale}
               onMeshesFound={handleMeshesFound}
@@ -157,10 +193,10 @@ const Viewer = ({ artwork }: ViewerProps) => {
         <OrbitControls
           enableZoom={true}
           makeDefault
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI / 1.9}
-          minDistance={5}
-          maxDistance={7}
+          minPolarAngle={controlsConfig.minPolarAngle}
+          maxPolarAngle={controlsConfig.maxPolarAngle}
+          minDistance={controlsConfig.minDistance}
+          maxDistance={controlsConfig.maxDistance}
         />
       </Canvas>
 
