@@ -42,7 +42,7 @@ const hexToRGB = (hex: string): [number, number, number] => {
   return [color.r, color.g, color.b]
 }
 
-const Model = ({
+export const Model = ({
   url,
   rotation,
   position,
