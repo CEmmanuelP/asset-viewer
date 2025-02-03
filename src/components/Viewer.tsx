@@ -44,8 +44,6 @@ const Model = ({ url, rotation, scale = 1, onMeshesFound }: ModelProps) => {
     gltf.scene.traverse((child) => {
       if (child.isMesh) {
         if (child.material && !Array.isArray(child.material)) {
-          child.material.transparent = true
-
           meshList.push({
             id: child.uuid,
             name: child.name,
