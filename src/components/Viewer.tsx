@@ -48,7 +48,7 @@ const Model = ({ url, rotation, scale = 1, onMeshesFound }: ModelProps) => {
 
           meshList.push({
             id: child.uuid,
-            name: child.name || `Part ${meshList.length + 1}`,
+            name: child.name,
           })
         }
       }
@@ -101,9 +101,9 @@ const Viewer = ({ artwork }: ViewerProps) => {
     setVisibleParts((prev) => {
       const newVisibility = { ...prev, [partId]: !prev[partId] }
       const model = scene.getObjectByProperty("uuid", partId) as THREE.Mesh
-      if (model?.material && !Array.isArray(model.material)) {
-        model.material.opacity = newVisibility[partId] ? 1 : 0
-      }
+
+      if (model) model.visible = newVisibility[partId]
+
       return newVisibility
     })
   }
