@@ -1,6 +1,6 @@
 export interface Artwork {
   id: number
-  src: string
+  parts: ArtworkPart[]
   thumbnail: string
   title: string
   author: string
@@ -11,6 +11,23 @@ export interface Artwork {
   description: string
   display?: Display
   scene?: SceneConfig
+}
+
+interface ArtworkPart {
+  id: string
+  name: string
+  src: string
+  position?: {
+    x: number
+    y: number
+    z: number
+  }
+  rotation?: {
+    x: number
+    y: number
+    z: number
+  }
+  scale?: number
 }
 
 interface Display {
@@ -50,7 +67,13 @@ const BASE_URL = import.meta.env.DEV ? "" : "/asset-viewer"
 export const artworks: Artwork[] = [
   {
     id: 1,
-    src: `${BASE_URL}/artworks/1/mihwangsa_dragonhead.glb`,
+    parts: [
+      {
+        id: "head",
+        name: "용두",
+        src: `${BASE_URL}/artworks/1/mihwangsa_dragonhead.glb`,
+      },
+    ],
     thumbnail: `${BASE_URL}/artworks/1/mihwangsa_dragonhead.webp`,
     title: "미황사 용두",
     author: "미상",
@@ -67,7 +90,24 @@ export const artworks: Artwork[] = [
   },
   {
     id: 2,
-    src: `${BASE_URL}/artworks/2/seonggasa.glb`,
+    parts: [
+      {
+        id: "monk",
+        name: "승가사",
+        src: `${BASE_URL}/artworks/2/mesh01.glb`,
+      },
+      {
+        id: "rock",
+        name: "광배",
+        src: `${BASE_URL}/artworks/2/mesh02.glb`,
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+      },
+    ],
+
     thumbnail: `${BASE_URL}/artworks/2/seonggasa.webp`,
     title: "승가사 석조승가대사 좌상",
     author: "미상",
@@ -84,7 +124,7 @@ export const artworks: Artwork[] = [
     display: {
       position: {
         x: 0,
-        y: 2,
+        y: 0,
         z: 0,
       },
       rotation: {

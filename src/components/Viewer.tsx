@@ -1,8 +1,8 @@
 import { Artwork } from "@/data"
 import { Center, OrbitControls, Stage, useProgress } from "@react-three/drei"
 import { Canvas, useLoader } from "@react-three/fiber"
-import { Suspense, useEffect, useState } from "react"
-import { Color, Euler, Group, Vector3 } from "three"
+import { Suspense, useState } from "react"
+import { Color, Euler, Vector3 } from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { Button } from "./ui/button"
@@ -27,8 +27,6 @@ export interface ModelProps {
   position?: { x: number; y: number; z: number }
   rotation?: { x: number; y: number; z: number }
   scale?: number
-
-  onMeshesFound: (meshes: { id: string; name: string }[], scene: Group) => void
 }
 
 const dracoLoader = new DRACOLoader()
@@ -42,36 +40,12 @@ const hexToRGB = (hex: string): [number, number, number] => {
   return [color.r, color.g, color.b]
 }
 
-export const Model = ({
-  url,
-  rotation,
-  position,
-  scale,
-  onMeshesFound,
-}: ModelProps) => {
+export const Model = ({ url, rotation, position, scale }: ModelProps) => {
   const gltf = useLoader(GLTFLoader, url, (loader) => {
     loader.setDRACOLoader(dracoLoader)
   })
 
   console.log(gltf.scene)
-
-  useEffect(() => {
-    const meshList: { id: string; name: string }[] = []
-
-    //@ts-expect-error - child maybe group | mesh
-    gltf.scene.traverse((child) => {
-      if (child.isMesh) {
-        if (child.material && !Array.isArray(child.material)) {
-          meshList.push({
-            id: child.uuid,
-            name: child.name,
-          })
-        }
-      }
-    })
-
-    onMeshesFound(meshList, gltf.scene)
-  }, [])
 
   const vector = position
     ? new Vector3(position.x, position.y, position.z)
@@ -81,18 +55,57 @@ export const Model = ({
     ? new Euler(rotation.x, rotation.y, rotation.z)
     : new Euler(0, 0, 0)
 
-  const scaleNumber = scale ? scale : 1
+  const number = scale ? scale : 1
+
+  return (
+    <primitive
+      object={gltf.scene}
+      castShadow
+      receiveShadow
+      position={vector}
+      rotation={euler}
+      scale={number}
+    />
+  )
+}
+
+const ArtworkGroup = ({
+  artwork,
+  visibleParts,
+}: {
+  artwork: Artwork
+  visibleParts: Record<string, boolean>
+}) => {
+  const display = artwork.display || {}
 
   return (
     <Center>
-      <primitive
-        object={gltf.scene}
-        castShadow
-        receiveShadow
-        position={vector}
-        rotation={euler}
-        scale={scaleNumber}
-      />
+      <group
+        position={[
+          display.position?.x || 0,
+          display.position?.y || 0,
+          display.position?.z || 0,
+        ]}
+        rotation={[
+          display.rotation?.x || 0,
+          display.rotation?.y || 0,
+          display.rotation?.z || 0,
+        ]}
+        scale={display.scale || 1}
+      >
+        {artwork.parts.map(
+          (part) =>
+            visibleParts[part.id] && (
+              <Model
+                key={part.id}
+                url={part.src}
+                position={part.position}
+                rotation={part.rotation}
+                scale={part.scale}
+              />
+            )
+        )}
+      </group>
     </Center>
   )
 }
@@ -100,38 +113,22 @@ export const Model = ({
 const Viewer = ({ artwork }: ViewerProps) => {
   const { progress, total, loaded } = useProgress()
   const isLoading = progress !== 100
-  const [meshes, setMeshes] = useState<{ id: string; name: string }[]>([])
-  const [scene, setScene] = useState<THREE.Group | null>(null)
-  const [visibleParts, setVisibleParts] = useState<Record<string, boolean>>({})
+  const [visibleParts, setVisibleParts] = useState<Record<string, boolean>>(
+    () =>
+      artwork.parts.reduce((acc, part) => {
+        acc[part.id] = true
+        return acc
+      }, {} as Record<string, boolean>)
+  )
 
   const cameraConfig = artwork.scene?.camera || DEFAULT_CAMERA
   const controlsConfig = artwork.scene?.controls || DEFAULT_CONTROLS
 
-  const handleMeshesFound = (
-    meshList: { id: string; name: string }[],
-    modelScene: THREE.Group
-  ) => {
-    setMeshes(meshList)
-    setScene(modelScene)
-
-    const initialVisibility = meshList.reduce((acc, mesh) => {
-      acc[mesh.id] = true
-      return acc
-    }, {} as Record<string, boolean>)
-    setVisibleParts(initialVisibility)
-  }
-
   const toggleVisibility = (partId: string) => {
-    if (!scene) return
-
-    setVisibleParts((prev) => {
-      const newVisibility = { ...prev, [partId]: !prev[partId] }
-      const model = scene.getObjectByProperty("uuid", partId) as THREE.Mesh
-
-      if (model) model.visible = newVisibility[partId]
-
-      return newVisibility
-    })
+    setVisibleParts((prev) => ({
+      ...prev,
+      [partId]: !prev[partId],
+    }))
   }
 
   const backgroundColor =
@@ -181,13 +178,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
             adjustCamera={1}
             environment="city"
           >
-            <Model
-              url={artwork.src}
-              position={artwork.display?.position}
-              rotation={artwork.display?.rotation}
-              scale={artwork.display?.scale}
-              onMeshesFound={handleMeshesFound}
-            />
+            <ArtworkGroup artwork={artwork} visibleParts={visibleParts} />
           </Stage>
         </Suspense>
         <OrbitControls
@@ -200,20 +191,18 @@ const Viewer = ({ artwork }: ViewerProps) => {
         />
       </Canvas>
 
-      {meshes.length > 0 && (
-        <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
-          {meshes.map((mesh) => (
-            <Button
-              key={mesh.id}
-              onClick={() => toggleVisibility(mesh.id)}
-              variant={visibleParts[mesh.id] ? "default" : "secondary"}
-              size="sm"
-            >
-              {mesh.name}
-            </Button>
-          ))}
-        </div>
-      )}
+      <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
+        {artwork.parts.map((part) => (
+          <Button
+            key={part.id}
+            onClick={() => toggleVisibility(part.id)}
+            variant={visibleParts[part.id] ? "default" : "secondary"}
+            size="sm"
+          >
+            {part.name}
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }
