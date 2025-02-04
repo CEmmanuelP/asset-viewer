@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber"
 import { Suspense, useState } from "react"
 import { Color } from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
-import { Model, ViewerProps } from "../Viewer"
+import { ArtworkGroup, ViewerProps } from "../Viewer"
 import { Button } from "../ui/button"
 
 const DEFAULT_CAMERA = {
@@ -33,38 +33,22 @@ const SceneViewer = ({ artwork }: ViewerProps) => {
   const { progress, total, loaded } = useProgress()
   const isLoading = progress !== 100
 
-  const [meshes, setMeshes] = useState<{ id: string; name: string }[]>([])
-  const [scene, setScene] = useState<THREE.Group | null>(null)
-  const [visibleParts, setVisibleParts] = useState<Record<string, boolean>>({})
+  const [visibleParts, setVisibleParts] = useState<Record<string, boolean>>(
+    () =>
+      artwork.parts.reduce((acc, part) => {
+        acc[part.id] = true
+        return acc
+      }, {} as Record<string, boolean>)
+  )
 
   const cameraConfig = artwork.scene?.camera || DEFAULT_CAMERA
   const controlsConfig = artwork.scene?.controls || DEFAULT_CONTROLS
 
-  const handleMeshesFound = (
-    meshList: { id: string; name: string }[],
-    modelScene: THREE.Group
-  ) => {
-    setMeshes(meshList)
-    setScene(modelScene)
-
-    const initialVisibility = meshList.reduce((acc, mesh) => {
-      acc[mesh.id] = true
-      return acc
-    }, {} as Record<string, boolean>)
-    setVisibleParts(initialVisibility)
-  }
-
   const toggleVisibility = (partId: string) => {
-    if (!scene) return
-
-    setVisibleParts((prev) => {
-      const newVisibility = { ...prev, [partId]: !prev[partId] }
-      const model = scene.getObjectByProperty("uuid", partId) as THREE.Mesh
-
-      if (model) model.visible = newVisibility[partId]
-
-      return newVisibility
-    })
+    setVisibleParts((prev) => ({
+      ...prev,
+      [partId]: !prev[partId],
+    }))
   }
 
   const backgroundColor =
@@ -114,13 +98,7 @@ const SceneViewer = ({ artwork }: ViewerProps) => {
             adjustCamera={1}
             environment="city"
           >
-            <Model
-              url={artwork.src}
-              position={artwork.display?.position}
-              rotation={artwork.display?.rotation}
-              scale={artwork.display?.scale}
-              onMeshesFound={handleMeshesFound}
-            />
+            <ArtworkGroup artwork={artwork} visibleParts={visibleParts} />
           </Stage>
         </Suspense>
         <OrbitControls
@@ -133,20 +111,18 @@ const SceneViewer = ({ artwork }: ViewerProps) => {
         />
       </Canvas>
 
-      {meshes.length > 0 && (
-        <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
-          {meshes.map((mesh) => (
-            <Button
-              key={mesh.id}
-              onClick={() => toggleVisibility(mesh.id)}
-              variant={visibleParts[mesh.id] ? "default" : "secondary"}
-              size="sm"
-            >
-              {mesh.name}
-            </Button>
-          ))}
-        </div>
-      )}
+      <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
+        {artwork.parts.map((part) => (
+          <Button
+            key={part.id}
+            onClick={() => toggleVisibility(part.id)}
+            variant={visibleParts[part.id] ? "default" : "secondary"}
+            size="sm"
+          >
+            {part.name}
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }

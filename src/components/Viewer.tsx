@@ -69,7 +69,7 @@ export const Model = ({ url, rotation, position, scale }: ModelProps) => {
   )
 }
 
-const ArtworkGroup = ({
+export const ArtworkGroup = ({
   artwork,
   visibleParts,
 }: {
