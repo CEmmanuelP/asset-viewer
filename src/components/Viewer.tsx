@@ -13,8 +13,8 @@ const DEFAULT_CAMERA = {
   fov: 35,
 }
 const DEFAULT_CONTROLS = {
-  minDistance: 5,
-  maxDistance: 7,
+  minDistance: 0,
+  maxDistance: 4,
   minPolarAngle: 0,
   maxPolarAngle: Math.PI / 1.9,
 }
@@ -166,15 +166,17 @@ const Viewer = ({ artwork }: ViewerProps) => {
         }}
       >
         <color attach="background" args={backgroundColor} />
+        <fog attach="fog" args={["black", 18, 25]} />
         <Suspense fallback={null}>
           <Stage
             intensity={0.7}
-            shadows={{
-              type: "contact",
-              color: "#000000",
-              opacity: 0.8,
-              blur: 2.5,
-            }}
+            // shadows={{
+            //   type: "contact",
+            //   color: "#000000",
+            //   opacity: 0.8,
+            //   blur: 2.5,
+            // }}
+            shadows={{ type: "accumulative", bias: -0.001, intensity: Math.PI }}
             adjustCamera={1}
             environment="city"
           >

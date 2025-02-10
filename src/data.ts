@@ -93,7 +93,7 @@ export const artworks: Artwork[] = [
     parts: [
       {
         id: "monk",
-        name: "승가사",
+        name: "승가대사상",
         src: `${BASE_URL}/artworks/2/mesh01.glb`,
       },
       {
@@ -135,11 +135,19 @@ export const artworks: Artwork[] = [
       scale: 2,
     },
     scene: {
+      backgroundColor: "#000000",
+      camera: {
+        position: {
+          x: 0,
+          y: 5,
+          z: 5,
+        },
+      },
       controls: {
-        minDistance: 2,
-        maxDistance: 7,
+        minDistance: 0,
+        maxDistance: 4,
         minPolarAngle: 0,
-        maxPolarAngle: (Math.PI * 3) / 4,
+        maxPolarAngle: Math.PI,
       },
     },
   },
