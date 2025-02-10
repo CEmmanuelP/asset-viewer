@@ -125,11 +125,11 @@ const SceneViewer = ({ artwork }: ViewerProps) => {
       </div>
 
       {/* Watermark */}
-      <div className="absolute bottom-4 right-4 text-right">
-        <p className="text-sm text-muted-foreground">
+      <div className="absolute bottom-6 right-4 text-right">
+        <p className="text-xs text-muted-foreground">
           자료제공 : 조선건축사사무소
         </p>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           웹 뷰어 모델 가공 : 스튜디오 점선면
         </p>
       </div>
