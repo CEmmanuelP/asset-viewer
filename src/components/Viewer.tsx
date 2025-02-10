@@ -192,6 +192,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
         />
       </Canvas>
 
+      {/* Parts Visibility */}
       <div className="absolute bottom-6 left-6 flex flex-wrap gap-2">
         {artwork.parts.map((part) => (
           <Button
@@ -203,6 +204,16 @@ const Viewer = ({ artwork }: ViewerProps) => {
             {part.name}
           </Button>
         ))}
+      </div>
+
+      {/* Watermark */}
+      <div className="absolute bottom-4 right-4 text-right">
+        <p className="text-sm text-muted-foreground">
+          자료제공 : 조선건축사사무소
+        </p>
+        <p className="text-sm text-muted-foreground">
+          웹 뷰어 모델 가공 : 스튜디오 점선면
+        </p>
       </div>
     </div>
   )
