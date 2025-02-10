@@ -12,10 +12,10 @@ const DEFAULT_CAMERA = {
   fov: 35,
 }
 const DEFAULT_CONTROLS = {
-  minDistance: 5,
-  maxDistance: 7,
+  minDistance: 0,
+  maxDistance: 3,
   minPolarAngle: 0,
-  maxPolarAngle: Math.PI / 1.9,
+  maxPolarAngle: Math.PI,
 }
 
 const dracoLoader = new DRACOLoader()

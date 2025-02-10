@@ -5,6 +5,7 @@ import { Suspense, useState } from "react"
 import { Color, Euler, Vector3 } from "three"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
+
 import { Button } from "./ui/button"
 import { Progress } from "./ui/progress"
 
@@ -14,9 +15,9 @@ const DEFAULT_CAMERA = {
 }
 const DEFAULT_CONTROLS = {
   minDistance: 0,
-  maxDistance: 4,
+  maxDistance: 3,
   minPolarAngle: 0,
-  maxPolarAngle: Math.PI / 1.9,
+  maxPolarAngle: Math.PI,
 }
 
 export interface ViewerProps {
@@ -166,7 +167,6 @@ const Viewer = ({ artwork }: ViewerProps) => {
         }}
       >
         <color attach="background" args={backgroundColor} />
-        <fog attach="fog" args={["black", 18, 25]} />
         <Suspense fallback={null}>
           <Stage
             intensity={0.7}
