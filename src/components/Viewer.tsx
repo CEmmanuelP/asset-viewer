@@ -170,13 +170,12 @@ const Viewer = ({ artwork }: ViewerProps) => {
         <Suspense fallback={null}>
           <Stage
             intensity={0.7}
-            // shadows={{
-            //   type: "contact",
-            //   color: "#000000",
-            //   opacity: 0.8,
-            //   blur: 2.5,
-            // }}
-            shadows={{ type: "accumulative", bias: -0.001, intensity: Math.PI }}
+            shadows={{
+              type: "contact",
+              color: "#000000",
+              opacity: 0.8,
+              blur: 2.5,
+            }}
             adjustCamera={1}
             environment="city"
           >
