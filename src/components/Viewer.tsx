@@ -11,7 +11,7 @@ import { Progress } from "./ui/progress"
 
 const DEFAULT_CAMERA = {
   position: { x: 4, y: -1, z: 8 },
-  fov: 35,
+  fov: 50,
 }
 const DEFAULT_CONTROLS = {
   minDistance: 0,
