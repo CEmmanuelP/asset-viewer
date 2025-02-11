@@ -87,6 +87,35 @@ export const artworks: Artwork[] = [
 
         This 3D printable model was digitised in collaboration between Scan the World and The Musée des Augustins. The sculpture was scanned in the museum and has been shared with their permission. The model can be downloaded and 3D printed from Scan the World.
         `,
+    display: {
+      position: {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      rotation: {
+        x: 0,
+        y: Math.PI / 4,
+        z: 0,
+      },
+    },
+    scene: {
+      backgroundColor: "#000000",
+      camera: {
+        position: {
+          x: 0,
+          y: 0,
+          z: 10,
+        },
+        fov: 50,
+      },
+      controls: {
+        minDistance: 0,
+        maxDistance: 15,
+        minPolarAngle: 0,
+        maxPolarAngle: Math.PI,
+      },
+    },
   },
   {
     id: 2,
@@ -140,13 +169,13 @@ export const artworks: Artwork[] = [
         position: {
           x: 0,
           y: 0,
-          z: 5,
+          z: 6,
         },
         fov: 50,
       },
       controls: {
         minDistance: 0,
-        maxDistance: 7,
+        maxDistance: 10,
         minPolarAngle: 0,
         maxPolarAngle: Math.PI,
       },
