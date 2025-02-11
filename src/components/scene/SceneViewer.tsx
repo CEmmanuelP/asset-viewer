@@ -95,7 +95,7 @@ const SceneViewer = ({ artwork }: ViewerProps) => {
               opacity: 0.8,
               blur: 2.5,
             }}
-            adjustCamera={1}
+            adjustCamera={false}
             environment="city"
           >
             <ArtworkGroup artwork={artwork} visibleParts={visibleParts} />
