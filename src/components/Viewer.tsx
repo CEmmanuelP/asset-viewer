@@ -1,5 +1,5 @@
 import { Artwork } from "@/data"
-import { Center, OrbitControls, Stage, useProgress } from "@react-three/drei"
+import { OrbitControls, Stage, useProgress } from "@react-three/drei"
 import { Canvas, useLoader } from "@react-three/fiber"
 import { Suspense, useState } from "react"
 import { Color, Euler, Vector3 } from "three"
@@ -79,35 +79,35 @@ export const ArtworkGroup = ({
 }) => {
   const display = artwork.display || {}
 
+  console.log(display.position)
+
   return (
-    <Center>
-      <group
-        position={[
-          display.position?.x || 0,
-          display.position?.y || 0,
-          display.position?.z || 0,
-        ]}
-        rotation={[
-          display.rotation?.x || 0,
-          display.rotation?.y || 0,
-          display.rotation?.z || 0,
-        ]}
-        scale={display.scale || 1}
-      >
-        {artwork.parts.map(
-          (part) =>
-            visibleParts[part.id] && (
-              <Model
-                key={part.id}
-                url={part.src}
-                position={part.position}
-                rotation={part.rotation}
-                scale={part.scale}
-              />
-            )
-        )}
-      </group>
-    </Center>
+    <group
+      position={[
+        display.position?.x || 0,
+        display.position?.y || 0,
+        display.position?.z || 0,
+      ]}
+      rotation={[
+        display.rotation?.x || 0,
+        display.rotation?.y || 0,
+        display.rotation?.z || 0,
+      ]}
+      scale={display.scale || 1}
+    >
+      {artwork.parts.map(
+        (part) =>
+          visibleParts[part.id] && (
+            <Model
+              key={part.id}
+              url={part.src}
+              position={part.position}
+              rotation={part.rotation}
+              scale={part.scale}
+            />
+          )
+      )}
+    </group>
   )
 }
 
@@ -124,6 +124,9 @@ const Viewer = ({ artwork }: ViewerProps) => {
 
   const cameraConfig = artwork.scene?.camera || DEFAULT_CAMERA
   const controlsConfig = artwork.scene?.controls || DEFAULT_CONTROLS
+
+  console.log(cameraConfig)
+  console.log(controlsConfig)
 
   const toggleVisibility = (partId: string) => {
     setVisibleParts((prev) => ({
@@ -176,7 +179,7 @@ const Viewer = ({ artwork }: ViewerProps) => {
               opacity: 0.8,
               blur: 2.5,
             }}
-            adjustCamera={1}
+            adjustCamera={false}
             environment="city"
           >
             <ArtworkGroup artwork={artwork} visibleParts={visibleParts} />

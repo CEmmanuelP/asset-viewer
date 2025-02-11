@@ -139,14 +139,14 @@ export const artworks: Artwork[] = [
       camera: {
         position: {
           x: 0,
-          y: 1,
-          z: 6,
+          y: 0,
+          z: 5,
         },
         fov: 50,
       },
       controls: {
         minDistance: 0,
-        maxDistance: 4,
+        maxDistance: 7,
         minPolarAngle: 0,
         maxPolarAngle: Math.PI,
       },
